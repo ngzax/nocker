@@ -1,6 +1,6 @@
-# Nockr - Erlang Implementation
+# Nocker
 
-An Erlang implementation of the Nock interpreter, converted from the Ruby version.
+An Erlang implementation of the Nock interpreter
 
 ## Overview
 
@@ -117,14 +117,6 @@ Interpreting [50 [4 [0 1]]] as Nock...
 51
 ```
 
-## Key Differences from Ruby Implementation
-
-1. **Data Representation**: Erlang uses tuples `{H, T}` instead of Ruby class instances
-2. **Pattern Matching**: Leverages Erlang's native pattern matching instead of OOP polymorphism
-3. **Immutability**: All data structures are immutable by default
-4. **Error Handling**: Uses `throw` for errors instead of Ruby exceptions
-5. **Type Checking**: Runtime type checking using guards and predicates
-
 ## Architecture
 
 The Erlang implementation follows a functional approach:
@@ -159,4 +151,6 @@ Additional Nock opcodes can be added to `interpret_opcode/3` in `nock.erl`:
 
 ## Testing
 
-All tests from the Ruby RSpec suite have been converted to EUnit tests in `test/nock_tests.erl`. Run the test suite to verify the implementation.
+```erlang
+rebar3 eunit
+```
