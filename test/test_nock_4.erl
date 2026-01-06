@@ -26,3 +26,18 @@ recursive_increment_alternate_syntax_test() ->
     Nock = nock:parse("[50 [4 [4 0 1]]]"),
     Result = nock:interpret(Nock),
     ?assertEqual(52, Result).
+
+increment_with_cell_subject_test() ->
+    Nock = nock:parse("[[100 150] [4 4 0 3]]"),
+    Result = nock:interpret(Nock),
+    ?assertEqual(152, Result).
+
+increment_ignoring_the_subject_test() ->
+    Nock = nock:parse("[50 [4 1 98]]"),
+    Result = nock:interpret(Nock),
+    ?assertEqual(99, Result).
+
+increment_failure_test() ->
+    %% Can not increment a cell...
+    Nock = nock:parse("[50 [4 1 [0 2]]]"),
+    ?assertThrow({error, cannot_increment_cell}, nock:interpret(Nock)).
