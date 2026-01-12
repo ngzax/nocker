@@ -64,7 +64,7 @@ interpret(NockExpr) ->
             Subject = subject(NockExpr),
             Formula = formula(NockExpr),
             Opcode = opcode(Formula),
-            interpret_opcode(Opcode, Subject, Formula)
+            interpreter:opcode(Opcode, Subject, Formula)
     end.
 
 %% Check if this is a valid Nock expression
@@ -84,43 +84,3 @@ formula(NockExpr) ->
 %% Extract opcode from formula: /[2 formula]
 opcode(Formula) ->
     noun:at(2, Formula).
-
-%% Extract slot/argument from formula: /[3 formula]
-slot(Formula) ->
-    noun:at(3, Formula).
-
-%% Interpret based on opcode
-%% Nock 0: Tree addressing
-%% *[a 0 b] -> /[b a]
-interpret_opcode(0, Subject, Formula) ->
-    Slot = slot(Formula),
-    case noun:is_atom(Slot) of
-        false ->
-            throw({error, slot_must_be_atom});
-        true ->
-            noun:at(Slot, Subject)
-    end;
-
-%% Nock 1: Constant
-%% *[a 1 b] -> b
-interpret_opcode(1, _Subject, Formula) ->
-    slot(Formula);
-
-%% Nock 4: Increment
-%% *[a 4 b] -> +*[a b]
-interpret_opcode(4, Subject, Formula) ->
-    %% Get the argument at position 3 of the formula
-    Arg = noun:at(3, Formula),
-    %% Create a new Nock expression [Subject Arg] and interpret it
-    Base = noun:from_list([noun:to_list(Subject), noun:to_list(Arg)]),
-    Result = interpret(Base),
-    %% Increment the result if it's an atom
-    case noun:is_atom(Result) of
-        true ->
-            noun:increment(Result);
-        false ->
-            throw({error, cannot_increment_cell})
-    end;
-
-interpret_opcode(Opcode, _Subject, _Formula) ->
-    throw({error, {unknown_opcode, Opcode}}).
