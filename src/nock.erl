@@ -1,5 +1,5 @@
 -module(nock).
--export([parse/1, interpret/1, nock/1]).
+-export([parse/1, interpret/1, nock/1, tokenize/1]).
 
 %% Parse a string representation into a Nock expression
 %% Example: "[[50 51] [0 1]]" -> {{50, 51}, {0, 1}}

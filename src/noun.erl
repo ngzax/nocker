@@ -1,6 +1,28 @@
 -module(noun).
--export([from_list/1, to_list/1, to_tuples/1, is_atom/1, is_cell/1,
-         at/2, increment/1, equal/2]).
+-export([at/2, from_list/1, to_list/1, to_tuples/1, is_atom/1, is_cell/1,
+         increment/1, equal/2]).
+
+%% Tree addressing: at(Index, Noun)
+%% /[1 a] -> a
+%% /[2 [a b]] -> a
+%% /[3 [a b]] -> b
+%% /[(a + a) b] -> /[2 /[a b]]
+%% /[(a + a + 1) b] -> /[3 /[a b]]
+at(1, Noun) ->
+    Noun;
+at(2, {H, _T}) ->
+    H;
+at(3, {_H, T}) ->
+    T;
+at(Index, Noun) when Index > 3, is_tuple(Noun) ->
+    %% Convert index to binary, remove leading 1, traverse tree
+    Bin = integer_to_binary(Index, 2),
+    <<_:1, Rest/bitstring>> = Bin,
+    traverse_binary(Rest, Noun);
+at(Index, _Noun) when is_integer(Index), Index < 1 ->
+    throw({error, invalid_index});
+at(_Index, Atom) when is_integer(Atom) ->
+    throw({error, atom_has_no_index}).
 
 %% Noun representation:
 %% - Atoms are represented as integers
@@ -55,28 +77,6 @@ is_cell({_, _}) ->
     true;
 is_cell(_) ->
     false.
-
-%% Tree addressing: at(Index, Noun)
-%% /[1 a] -> a
-%% /[2 [a b]] -> a
-%% /[3 [a b]] -> b
-%% /[(a + a) b] -> /[2 /[a b]]
-%% /[(a + a + 1) b] -> /[3 /[a b]]
-at(1, Noun) ->
-    Noun;
-at(2, {H, _T}) ->
-    H;
-at(3, {_H, T}) ->
-    T;
-at(Index, Noun) when Index > 3, is_tuple(Noun) ->
-    %% Convert index to binary, remove leading 1, traverse tree
-    Bin = integer_to_binary(Index, 2),
-    <<_:1, Rest/bitstring>> = Bin,
-    traverse_binary(Rest, Noun);
-at(Index, _Noun) when is_integer(Index), Index < 1 ->
-    throw({error, invalid_index});
-at(_Index, Atom) when is_integer(Atom) ->
-    throw({error, atom_has_no_index}).
 
 %% Helper: traverse tree using binary representation
 traverse_binary(<<>>, Noun) ->

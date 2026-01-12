@@ -48,9 +48,21 @@ bad_slot_test() ->
     %% Should crash on invalid slot
     ?assertThrow({error, _}, nock:interpret(Nock)).
 
-cell_slot_test() ->
+cell_slot_fails_test() ->
     %% [[50 51] [0 [0 1]]] - slot must be an atom
     Nock = nock:parse("[[50 51] [0 [0 1]]]"),
-
     %% Should crash when slot is a cell
     ?assertThrow({error, slot_must_be_atom}, nock:interpret(Nock)).
+
+right_hand_cell_omission_test() ->
+    %% [1 [2 3]] can be written equivalently as [1 2 3]
+    Nock1 = nock:parse("[1 [2 3]]"),
+    Nock2 = nock:parse("[1 2 3]"),
+    ?assertEqual(Nock1, Nock2).
+
+large_subject_tail_test() ->
+    Nock = nock:parse("[[[[41 42 [43 44] [45 46] [47 48] [49 50]]] [51 52]] [0 3]]"),
+
+    %% Interpret: should return the tail of subject ([51 52])
+    Result = nock:interpret(Nock),
+    ?assertEqual([51, 52], noun:to_list(Result)).

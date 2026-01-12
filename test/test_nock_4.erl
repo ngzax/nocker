@@ -41,3 +41,8 @@ increment_failure_test() ->
     %% Can not increment a cell...
     Nock = nock:parse("[50 [4 1 [0 2]]]"),
     ?assertThrow({error, cannot_increment_cell}, nock:interpret(Nock)).
+
+% increment_with_cell_as_subject_test() ->
+    %% Can not increment a cell...
+    % Nock = nock:parse("[[19 20] [[0 1] [1 76] [4 4 0 3]]]"),
+    % ?assertEqual([[19, 20], 76, 22], nock:interpret(Nock)).
