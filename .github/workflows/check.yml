@@ -1,26 +1,35 @@
-name: Erlang CI
-
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
+
+name: Erlang CI (setup-beam - latest OTP)
 
 permissions:
   contents: read
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
 
-    container:
-      image: erlang:22.0.7-buster
-
     steps:
-    - uses: actions/checkout@v4
-    - name: Compile
-      run: rebar3 compile
-    - name: Run tests
-      run: rebar3 eunit
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Erlang/OTP (latest) and rebar3
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: 'latest'
+          rebar3: true
+
+      - name: Show installed OTP and rebar3 versions
+        run: |
+          erl -version
+          rebar3 --version
+
+      - name: Compile
+        run: rebar3 compile
+
+      - name: Run tests
+        run: rebar3 eunit
