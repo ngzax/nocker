@@ -21,7 +21,7 @@ jobs:
         uses: erlef/setup-beam@v1
         with:
           otp-version: 'latest'
-          rebar3: true
+          rebar3-version: 'latest'
 
       - name: Show installed OTP and rebar3 versions
         run: |
