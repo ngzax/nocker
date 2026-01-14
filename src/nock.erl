@@ -1,5 +1,9 @@
 -module(nock).
--export([parse/1, interpret/1, nock/1, tokenize/1]).
+-export([formula/1, interpret/1, nock/1, opcode/1, parse/1, subject/1, tokenize/1]).
+
+%% Extract formula from Nock expression: /[3 [subject formula]]
+formula(NockExpr) ->
+    noun:at(3, NockExpr).
 
 %% Parse a string representation into a Nock expression
 %% Example: "[[50 51] [0 1]]" -> {{50, 51}, {0, 1}}
@@ -46,14 +50,6 @@ tokenize([C|Rest], Acc) when C >= $0, C =< $9 ->
     {Num, Remaining} = parse_number([C|Rest], []),
     tokenize(Remaining, [list_to_integer(lists:reverse(Num))|Acc]).
 
-%% Main interpreter entry point
-nock(Input) when is_list(Input) ->
-    Nock = parse(Input),
-    io:format("Interpreting ~s as Nock...~n", [Input]),
-    Result = interpret(Nock),
-    io:format("=> ~p~n", [Result]),
-    Result.
-
 %% Interpret a Nock expression
 %% Nock structure: [Subject Formula]
 interpret(NockExpr) ->
@@ -73,14 +69,20 @@ is_nock({_Subject, {_OpCode, _Arg}}) ->
 is_nock(_) ->
     false.
 
-%% Extract subject from Nock expression: /[2 [subject formula]]
-subject(NockExpr) ->
-    noun:at(2, NockExpr).
-
-%% Extract formula from Nock expression: /[3 [subject formula]]
-formula(NockExpr) ->
-    noun:at(3, NockExpr).
+%% --------------------------------------------------------------------
+%% Main interpreter entry point
+%% --------------------------------------------------------------------
+nock(Input) when is_list(Input) ->
+    Nock = parse(Input),
+    io:format("Interpreting ~s as Nock...~n", [Input]),
+    Result = interpret(Nock),
+    io:format("=> ~p~n", [Result]),
+    Result.
 
 %% Extract opcode from formula: /[2 formula]
 opcode(Formula) ->
     noun:at(2, Formula).
+
+%% Extract subject from Nock expression: /[2 [subject formula]]
+subject(NockExpr) ->
+    noun:at(2, NockExpr).

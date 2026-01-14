@@ -24,6 +24,12 @@ at(Index, _Noun) when is_integer(Index), Index < 1 ->
 at(_Index, Atom) when is_integer(Atom) ->
     throw({error, atom_has_no_index}).
 
+%% Equality check
+equal(A, A) ->
+    true;
+equal(_, _) ->
+    false.
+
 %% Noun representation:
 %% - Atoms are represented as integers
 %% - Cells are represented as {Head, Tail} tuples
@@ -93,9 +99,3 @@ increment(N) when is_integer(N) ->
     N + 1;
 increment({_H, _T}) ->
     throw({error, cannot_increment_cell}).
-
-%% Equality check
-equal(A, A) ->
-    true;
-equal(_, _) ->
-    false.
