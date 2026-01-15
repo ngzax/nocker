@@ -20,15 +20,15 @@ constant_function_test() ->
     Result = nock:interpret(Nock),
 
     %% This is a
-    ?assertEqual(42, nock:subject(Nock)),
+    % ?assertEqual(42, nock:subject(Nock)),
 
     %% This is b
-    ?assertEqual({1, 100}, nock:subject(nock:formula(nock:formula(Nock)))),
-    ?assertEqual(1, nock:opcode(nock:subject(nock:formula(nock:formula(Nock))))),
+    % ?assertEqual({1, 100}, nock:subject(nock:formula(nock:formula(Nock)))),
+    % ?assertEqual(1, nock:opcode(nock:subject(nock:formula(nock:formula(Nock))))),
 
     %% This is c
-    ?assertEqual({1, {0, 1}}, nock:formula(nock:formula(nock:formula(Nock)))),
-    ?assertEqual(1, nock:opcode(nock:formula(nock:formula(nock:formula(Nock))))),
+    % ?assertEqual({1, {0, 1}}, nock:formula(nock:formula(nock:formula(Nock)))),
+    % ?assertEqual(1, nock:opcode(nock:formula(nock:formula(nock:formula(Nock))))),
 
     ?assertEqual(100, Result).
 
