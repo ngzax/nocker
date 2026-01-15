@@ -1,12 +1,39 @@
 -module(nock).
 -export([formula/1, interpret/1, nock/1, opcode/1, parse/1, subject/1, tokenize/1]).
 
-%% Extract formula from Nock expression: /[3 [subject formula]]
-formula(NockExpr) ->
-    noun:at(3, NockExpr).
+%% --------------------------------------------------------------------
+%% Testing
+%%
+%% Check if this is a valid Nock expression
+%% --------------------------------------------------------------------
+is_nock({_Subject, {_OpCode, _Arg}}) ->
+    true;
+is_nock(_) ->
+    false.
 
+%% --------------------------------------------------------------------
+%% Interpreter
+%%
+%% Interpret a Nock expression
+%% Nock structure: [Subject Formula]
+%% --------------------------------------------------------------------
+interpret(NockExpr) ->
+    case is_nock(NockExpr) of
+        false ->
+            throw({error, invalid_nock_expression});
+        true ->
+            Subject = subject(NockExpr),
+            Formula = formula(NockExpr),
+            Opcode = opcode(Formula),
+            interpreter:opcode(Opcode, Subject, Formula)
+    end.
+
+%% --------------------------------------------------------------------
+%% Parser
+%%
 %% Parse a string representation into a Nock expression
 %% Example: "[[50 51] [0 1]]" -> {{50, 51}, {0, 1}}
+%% --------------------------------------------------------------------
 parse(String) when is_list(String) ->
     %% Tokenize the string
     Tokens = tokenize(String),
@@ -34,7 +61,11 @@ parse_tokens(['['|Rest]) ->
 parse_tokens([N|Rest]) when is_integer(N) ->
     {N, Rest}.
 
+%% --------------------------------------------------------------------
+%% Tokenizer
+%%
 %% Tokenize string into brackets and numbers
+%% --------------------------------------------------------------------
 tokenize(String) ->
     tokenize(String, []).
 
@@ -50,25 +81,6 @@ tokenize([C|Rest], Acc) when C >= $0, C =< $9 ->
     {Num, Remaining} = parse_number([C|Rest], []),
     tokenize(Remaining, [list_to_integer(lists:reverse(Num))|Acc]).
 
-%% Interpret a Nock expression
-%% Nock structure: [Subject Formula]
-interpret(NockExpr) ->
-    case is_nock(NockExpr) of
-        false ->
-            throw({error, invalid_nock_expression});
-        true ->
-            Subject = subject(NockExpr),
-            Formula = formula(NockExpr),
-            Opcode = opcode(Formula),
-            interpreter:opcode(Opcode, Subject, Formula)
-    end.
-
-%% Check if this is a valid Nock expression
-is_nock({_Subject, {_OpCode, _Arg}}) ->
-    true;
-is_nock(_) ->
-    false.
-
 %% --------------------------------------------------------------------
 %% Main interpreter entry point
 %% --------------------------------------------------------------------
@@ -78,6 +90,10 @@ nock(Input) when is_list(Input) ->
     Result = interpret(Nock),
     io:format("=> ~p~n", [Result]),
     Result.
+
+%% Extract formula from Nock expression: /[3 [subject formula]]
+formula(NockExpr) ->
+    noun:at(3, NockExpr).
 
 %% Extract opcode from formula: /[2 formula]
 opcode(Formula) ->
