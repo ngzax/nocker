@@ -27,7 +27,7 @@ recursive_increment_alternate_syntax_test() ->
     Result = nock:interpret(Nock),
     ?assertEqual(52, Result).
 
-increment_with_cell_subject_test() ->
+increment_with_cell_subject_but_formula_returns_atom_test() ->
     Nock = nock:parse("[[100 150] [4 4 0 3]]"),
     Result = nock:interpret(Nock),
     ?assertEqual(152, Result).
@@ -37,12 +37,11 @@ increment_ignoring_the_subject_test() ->
     Result = nock:interpret(Nock),
     ?assertEqual(99, Result).
 
-increment_failure_test() ->
+increment_fails_with_cell_as_subject_test() ->
     %% Can not increment a cell...
     Nock = nock:parse("[50 [4 1 [0 2]]]"),
     ?assertThrow({error, cannot_increment_cell}, nock:interpret(Nock)).
 
-% increment_with_cell_as_subject_test() ->
-    %% Can not increment a cell...
-    % Nock = nock:parse("[[19 20] [[0 1] [1 76] [4 4 0 3]]]"),
-    % ?assertEqual([[19, 20], 76, 22], nock:interpret(Nock)).
+deeply_nested_increment_test() ->
+    Nock = nock:parse("[42 [4 4 4 4 4 4 4 4 4 0 1]]"),
+    ?assertEqual(51, nock:interpret(Nock)).

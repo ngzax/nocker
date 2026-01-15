@@ -79,7 +79,6 @@ interpret(2, Subject, Formula) ->
     interpret(noun:reconstruct(NewSubject, NewFormula));
 
 %% Nock 3: Cell Check
-%%
 %% *[a 3 b] -> ?*[a b]
 %%
 %% Opcode 3 tests whether the product of formula b is a cell or an atom.
@@ -90,6 +89,9 @@ interpret(3, Subject, Formula) ->
 
 %% Nock 4: Increment
 %% *[a 4 b] -> +*[a b]
+%%
+%% Opcode 4 adds 1 to the product of formula b.
+%% This is Nock's only arithmetic primitive—all other arithmetic must be built from increment.
 
 interpret(4, Subject, Formula) ->
     Result = interpret(Subject, Formula),
