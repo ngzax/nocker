@@ -61,7 +61,6 @@ interpret(1, _Subject, Formula) ->
 %%
 %% Opcode 2 implements the * tar evaluate operator, which dynamically computes a new subject and formula,
 %%   then evaluates the formula against the subject.
-%%
 
 interpret(2, Subject, Formula) ->
     %% Evaluate the subject against position 2 (the subject) of the formula to get a new Subject
@@ -74,6 +73,21 @@ interpret(2, Subject, Formula) ->
 
     Base = noun:from_list(noun:to_list(NewSubject) ++ noun:to_list(NewFormula)),
     interpret(Base);
+
+%% Nock 3: Cell Check
+%%
+%% *[a 3 b] -> ?*[a b]
+%%
+%% Opcode 3 tests whether the product of formula b is a cell or an atom.
+%% It returns 0 (yes) if it's a cell, 1 (no) if it's an atom.
+
+interpret(3, Subject, Formula) ->
+    %% Get the argument at position 3 of the formula
+    Arg = noun:at(3, Formula),
+    %% Create a new Nock expression [Subject Arg] and interpret it
+    Base = noun:from_list([noun:to_list(Subject), noun:to_list(Arg)]),
+    Result = interpret(Base),
+    noun:is_cell(Result);
 
 %% Nock 4: Increment
 %% *[a 4 b] -> +*[a b]
