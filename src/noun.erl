@@ -1,6 +1,6 @@
 -module(noun).
 -export([at/2, from_list/1, to_list/1, to_tuples/1, is_atom/1, is_cell/1,
-         increment/1, equal/2]).
+         increment/1, equal/2, reconstruct/2]).
 
 %% Tree addressing: at(Index, Noun)
 %% /[1 a] -> a
@@ -73,6 +73,12 @@ to_tuples([H, T]) ->
 to_tuples([H | Rest]) ->
     [to_tuples(H), to_tuples(Rest)].
 
+%% Increment an atom
+increment(N) when is_integer(N) ->
+    N + 1;
+increment({_H, _T}) ->
+    throw({error, cannot_increment_cell}).
+
 %% Type predicates
 is_atom(N) when is_integer(N) ->
     true;
@@ -84,6 +90,12 @@ is_cell({_, _}) ->
 is_cell(_) ->
     false.
 
+%%
+%% Reconstruct: Build a new noun from 2 other nouns.
+%%
+reconstruct(A, B) ->
+    from_list([to_list(A), to_list(B)]).
+
 %% Helper: traverse tree using binary representation
 traverse_binary(<<>>, Noun) ->
     Noun;
@@ -93,9 +105,3 @@ traverse_binary(<<1:1, Rest/bitstring>>, {_H, T}) ->
     traverse_binary(Rest, T);
 traverse_binary(_, Atom) when is_integer(Atom) ->
     throw({error, invalid_index}).
-
-%% Increment an atom
-increment(N) when is_integer(N) ->
-    N + 1;
-increment({_H, _T}) ->
-    throw({error, cannot_increment_cell}).

@@ -29,6 +29,11 @@ interpret(NockExpr) ->
             interpret(Opcode, Subject, Formula)
     end.
 
+interpret(Subject, Formula) ->
+    %% Create a new Nock expression [Subject Arg (the argument at position 3 of the formula)]
+    %%   and interpret it
+    interpret(noun:reconstruct(Subject, slot(Formula))).
+
 %% Nock 0: Tree addressing
 %% *[a 0 b] -> /[b a]
 %%
@@ -71,8 +76,7 @@ interpret(2, Subject, Formula) ->
     C = formula(formula(Formula)),
     NewFormula = interpret(opcode(C), Subject, C),
 
-    Base = noun:from_list(noun:to_list(NewSubject) ++ noun:to_list(NewFormula)),
-    interpret(Base);
+    interpret(noun:reconstruct(NewSubject, NewFormula));
 
 %% Nock 3: Cell Check
 %%
@@ -82,22 +86,13 @@ interpret(2, Subject, Formula) ->
 %% It returns 0 (yes) if it's a cell, 1 (no) if it's an atom.
 
 interpret(3, Subject, Formula) ->
-    %% Get the argument at position 3 of the formula
-    Arg = noun:at(3, Formula),
-    %% Create a new Nock expression [Subject Arg] and interpret it
-    Base = noun:from_list([noun:to_list(Subject), noun:to_list(Arg)]),
-    Result = interpret(Base),
-    noun:is_cell(Result);
+    noun:is_cell(interpret(Subject, Formula));
 
 %% Nock 4: Increment
 %% *[a 4 b] -> +*[a b]
 
 interpret(4, Subject, Formula) ->
-    %% Get the argument at position 3 of the formula
-    Arg = noun:at(3, Formula),
-    %% Create a new Nock expression [Subject Arg] and interpret it
-    Base = noun:from_list([noun:to_list(Subject), noun:to_list(Arg)]),
-    Result = interpret(Base),
+    Result = interpret(Subject, Formula),
     %% Increment the result if it's an atom
     case noun:is_atom(Result) of
         true ->
