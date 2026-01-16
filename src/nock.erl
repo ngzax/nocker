@@ -88,7 +88,7 @@ interpret(3, Subject, Formula) ->
     noun:is_cell(interpret(Subject, Formula));
 
 %% Nock 4: Increment
-%% *[a 4 b] -> +*[a b]
+%% *[a 4 b]         +*[a b]
 %%
 %% Opcode 4 adds 1 to the product of formula b.
 %% This is Nock's only arithmetic primitive—all other arithmetic must be built from increment.
@@ -102,6 +102,23 @@ interpret(4, Subject, Formula) ->
         false ->
             throw({error, cannot_increment_cell})
     end;
+
+%% Nock 5: Equality Check
+%% *[a 5 b c]   =[*[a b] *[a c]]
+%%
+%% Opcode 5 implements the idiomatic = tis equality operator,
+%%   which tests for deep equality between two nouns.
+
+interpret(5, Subject, Formula) ->
+    %% Evaluate the subject against position 2 (the subject) of the formula to get a new Subject
+    B = subject(formula(Formula)),
+    LHS = interpret(opcode(B), Subject, B),
+
+    %% Evaluate the subject against position 3 (the formula) of the formula to get a new Formula
+    C = formula(formula(Formula)),
+    RHS = interpret(opcode(C), Subject, C),
+
+    LHS =:= RHS;
 
 interpret(Opcode, _Subject, _Formula) ->
     throw({error, {unknown_opcode, Opcode}}).
