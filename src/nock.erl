@@ -69,12 +69,10 @@ interpret(1, _Subject, Formula) ->
 
 interpret(2, Subject, Formula) ->
     %% Evaluate the subject against position 2 (the subject) of the formula to get a new Subject
-    B = subject(formula(Formula)),
-    NewSubject = interpret(opcode(B), Subject, B),
+    NewSubject = interpret(opcode(b(Formula)), Subject, b(Formula)),
 
     %% Evaluate the subject against position 3 (the formula) of the formula to get a new Formula
-    C = formula(formula(Formula)),
-    NewFormula = interpret(opcode(C), Subject, C),
+    NewFormula = interpret(opcode(c(Formula)), Subject, c(Formula)),
 
     interpret(noun:reconstruct(NewSubject, NewFormula));
 
@@ -110,14 +108,8 @@ interpret(4, Subject, Formula) ->
 %%   which tests for deep equality between two nouns.
 
 interpret(5, Subject, Formula) ->
-    %% Evaluate the subject against position 2 (the subject) of the formula to get a new Subject
-    B = subject(formula(Formula)),
-    LHS = interpret(opcode(B), Subject, B),
-
-    %% Evaluate the subject against position 3 (the formula) of the formula to get a new Formula
-    C = formula(formula(Formula)),
-    RHS = interpret(opcode(C), Subject, C),
-
+    LHS = interpret(opcode(b(Formula)), Subject, b(Formula)),
+    RHS = interpret(opcode(c(Formula)), Subject, c(Formula)),
     LHS =:= RHS;
 
 interpret(Opcode, _Subject, _Formula) ->
@@ -189,6 +181,12 @@ nock(Input) when is_list(Input) ->
 %% --------------------------------------------------------------------
 %% Navigation Shortcuts
 %% --------------------------------------------------------------------
+
+b(NockExpr) ->
+    subject(formula(NockExpr)).
+
+c(NockExpr) ->
+    formula(formula(NockExpr)).
 
 %% Extract formula from Nock expression: /[3 [subject formula]]
 formula(NockExpr) ->
