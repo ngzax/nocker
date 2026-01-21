@@ -112,6 +112,22 @@ interpret(5, Subject, Formula) ->
     RHS = interpret(opcode(c(Formula)), Subject, c(Formula)),
     LHS =:= RHS;
 
+%% Nock 6: Conditional
+%% *[a 6 b c d]     *[a *[[c d] 0 *[[2 3] 0 *[a 4 4 b]]]]
+%%
+%% Opcode 6 a conditional branch. Evaluate test formula b; if true (0),
+%    evaluate and return c; if false (1), evaluate and return d.
+%    Crashes on non-boolean test results.
+
+interpret(6, Subject, Formula) ->
+    Cond = interpret(opcode(b(Formula)), Subject, b(Formula)),
+    % RHS = interpret(opcode(c(Formula)), Subject, c(Formula)),
+    % LHS =:= RHS,
+    Result = if Cond -> interpret(Subject, noun:at(14, Formula));
+                true -> 0
+            end,
+    Result;
+
 interpret(Opcode, _Subject, _Formula) ->
     throw({error, {unknown_opcode, Opcode}}).
 

@@ -15,9 +15,9 @@ at(2, {H, _T}) ->
 at(3, {_H, T}) ->
     T;
 at(Index, Noun) when Index > 3, is_tuple(Noun) ->
-    %% Convert index to binary, remove leading 1, traverse tree
+    %% Convert index to binary string, remove leading "1", traverse tree
     Bin = integer_to_binary(Index, 2),
-    <<_:1, Rest/bitstring>> = Bin,
+    <<_:8, Rest/binary>> = Bin,
     traverse_binary(Rest, Noun);
 at(Index, _Noun) when is_integer(Index), Index < 1 ->
     throw({error, invalid_index});
@@ -96,12 +96,12 @@ is_cell(_) ->
 reconstruct(A, B) ->
     from_list([to_list(A), to_list(B)]).
 
-%% Helper: traverse tree using binary representation
+%% Helper: traverse tree using binary string representation
 traverse_binary(<<>>, Noun) ->
     Noun;
-traverse_binary(<<0:1, Rest/bitstring>>, {H, _T}) ->
+traverse_binary(<<$0, Rest/binary>>, {H, _T}) ->
     traverse_binary(Rest, H);
-traverse_binary(<<1:1, Rest/bitstring>>, {_H, T}) ->
+traverse_binary(<<$1, Rest/binary>>, {_H, T}) ->
     traverse_binary(Rest, T);
 traverse_binary(_, Atom) when is_integer(Atom) ->
     throw({error, invalid_index}).
