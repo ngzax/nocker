@@ -1,5 +1,5 @@
 -module(nock).
--export([interpret/1, nock/1, parse/1, tokenize/1]).
+-export([interpret/1, interpret/2, nock/1, parse/1, tokenize/1]).
 
 %% --------------------------------------------------------------------
 %% Testing
@@ -121,10 +121,10 @@ interpret(5, Subject, Formula) ->
 
 interpret(6, Subject, Formula) ->
     Cond = interpret(opcode(b(Formula)), Subject, b(Formula)),
-    % RHS = interpret(opcode(c(Formula)), Subject, c(Formula)),
-    % LHS =:= RHS,
-    Result = if Cond -> interpret(Subject, noun:at(14, Formula));
-                true -> 0
+    % erlang:display(Formula),
+    % erlang:display(slot(Formula)),
+    Result = if Cond -> interpret({{Subject}, subject(c(Formula))});
+                true -> interpret({{Subject}, formula(c(Formula))})
             end,
     Result;
 
