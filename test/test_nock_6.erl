@@ -6,6 +6,21 @@
 %%
 %% *[a 6 b c d]       *[a *[[c d] 0 *[[2 3] 0 *[a 4 4 b]]]]
 %%
+%% Opcode 6 a conditional branch. Evaluate test formula b; if true (0),
+%% evaluate and return c; if false (1), evaluate and return d. Crashes 
+%% on non-boolean test results.
+%%
+%% In fact, much of the weirdness of the macro expression can be explained 
+%% by its parsimonious use of the boolean result. From right to left:
+%%
+%% 1. *[a 4 4 b] evaluates b, then adds 2 (so 0 → 2, 1 → 3).
+%% 2. *[[2 3] 0 ...] uses the result as an address into [2 3].
+%% 3. *[[c d] 0 ...] uses 2 or 3 as address into [c d].
+%%
+%% This cleverly selects c (at address 2) for true, d (at address 3) for false. 
+%% (It does not pass through directly to avoid other results selecting other 
+%% possible slots.)
+%%
 
 conditional_true_test() ->
   %% [42 [6 [5 [1 42] [0 1]] [1 100] [1 0]]] -> [42 [6 [42] [100] [0]] ->  100

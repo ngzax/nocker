@@ -2,8 +2,24 @@
 -include_lib("eunit/include/eunit.hrl").
 
 %% Opcode 5 is the "equality" operator. = (wut)
+%% *[a 5 b c]   =[*[a b] *[a c]]
 %%
-%% *[a 3 b] -> ?*[a b]
+%% Opcode 5 implements the idiomatic = tis equality operator,
+%% which tests for deep equality between two nouns.
+%%
+%% Opcode 5 tests whether the products of formulas b and c are 
+%% structurally identical. It returns 0 if equal, 1 if not.
+%%
+%% 1. Evaluate b against the subject to produce noun l.
+%% 2. Evaluate c against the subject to produce noun r.
+%% 3. Return 0 if l and r are identical nouns, 1 otherwise.
+%%
+%% =[a a]              0
+%% =[a b]              1
+%%
+%% Like opcode 3, = tis checks by structure, and also by value. 
+%% Equality is deep structural comparison: two cells are equal 
+%% iff their heads are equal and their tails are equal.
 %%
 
 equality_atom_subject_check_true_test() ->

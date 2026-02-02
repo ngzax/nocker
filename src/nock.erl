@@ -102,11 +102,7 @@ interpret(4, Subject, Formula) ->
     end;
 
 %% Nock 5: Equality Check
-%% *[a 5 b c]   =[*[a b] *[a c]]
 %%
-%% Opcode 5 implements the idiomatic = tis equality operator,
-%%   which tests for deep equality between two nouns.
-
 interpret(5, Subject, Formula) ->
     LHS = interpret(opcode(b(Formula)), Subject, b(Formula)),
     RHS = interpret(opcode(c(Formula)), Subject, c(Formula)),
