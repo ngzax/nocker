@@ -2,7 +2,7 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
-%% Opcode 6 is the "Compose" operator.
+%% Opcode 7 is the "Compose" operator.
 %%
 %% *[a 7 b c]          *[*[a b] c]
 %%
@@ -25,15 +25,15 @@ chain_computation_test() ->
   Result = nock:interpret(Nock),
   ?assertEqual(44, Result).
 
-%% conditional_false_test() ->
-%%   %% [42 [6 [5 [1 99] [0 1]] [1 100] [1 0]]] -> [42 [6 [99] [100] [0]] ->  0
-%%   Nock = nock:parse("[42 [6 [5 [1 99] [0 1]] [1 100] [1 0]]]]"),
-%%   Result = nock:interpret(Nock),
-%%   ?assertEqual(0, Result).
-%% 
-%% conditional_not_operator_test() ->
-%%   %% [0 [6 [5 [1 0] [0 1]] [1 1] [1 0]]] -> [0 [6 [0] [1] [0]] -> 1
-%%   Nock = nock:parse("[0 [6 [5 [1 0] [0 1]] [1 1] [1 0]]]"),
+chain_computation_plus_cell_check_test() ->
+  %% [42 [7 [4 0 1] [7 [4 0 1] 3 0 1]]] ->  1 (false)
+  Nock = nock:parse("[42 [7 [4 0 1] [7 [4 0 1] 3 0 1]]]"),
+  Result = nock:interpret(Nock),
+  ?assertEqual(false, Result).
+ 
+%% chain_create_cell_from_subject_cell_check_test() ->
+%%   %% [42 [7 [[0 1] [0 1]] 3 0 1]] -> 0 (true)
+%%   Nock = nock:parse("[42 [7 [[0 1] [0 1]] 3 0 1]]"),
 %%   Result = nock:interpret(Nock),
 %%   ?assertEqual(1, Result).
-%%
+
