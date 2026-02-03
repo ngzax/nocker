@@ -66,3 +66,4 @@ large_subject_tail_test() ->
     %% Interpret: should return the tail of subject ([51 52])
     Result = nock:interpret(Nock),
     ?assertEqual([51, 52], noun:to_list(Result)).
+
