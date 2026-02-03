@@ -1,5 +1,5 @@
 -module(noun).
--export([at/2, from_list/1, to_list/1, to_tuples/1, is_atom/1, is_cell/1,
+-export([at/2, from_list/1, to_list/1, to_string/1, to_tuples/1, is_atom/1, is_cell/1,
          increment/1, equal/2, reconstruct/2]).
 
 %% Tree addressing: at(Index, Noun)
@@ -19,14 +19,17 @@ at(Index, Noun) when Index > 3, is_tuple(Noun) ->
     Bin = integer_to_binary(Index, 2),
     <<_:8, Rest/binary>> = Bin,
     traverse_binary(Rest, Noun);
+
 at(Index, _Noun) when is_integer(Index), Index < 1 ->
     throw({error, invalid_index});
+
 at(_Index, Atom) when is_integer(Atom) ->
     throw({error, atom_has_no_index}).
 
 %% Equality check
 equal(A, A) ->
     true;
+
 equal(_, _) ->
     false.
 
@@ -61,6 +64,26 @@ to_list({H, T}) ->
         false -> to_list(T)
     end,
     [HList, TList].
+
+%% Convert to a nock-style string representation.
+%% Flattens right-associative cells: {1, {2, 3}} -> "[1 2 3]"
+%%
+to_string(N) when is_integer(N) ->
+    integer_to_list(N);
+
+to_string({N}) when is_integer(N) ->
+    integer_to_list(N);
+
+to_string({H, T}) ->
+    Elements = [to_string(H) | tail_elements(T)],
+    "[" ++ string:join(Elements, " ") ++ "]".
+
+tail_elements(N) when is_integer(N) ->
+    [integer_to_list(N)];
+
+tail_elements({H, T}) ->
+    [to_string(H) | tail_elements(T)].
+
 
 %% Convert n-ary list to binary tuples (Nock's native structure)
 %% [a b c] -> [a [b c]]

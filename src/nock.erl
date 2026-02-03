@@ -26,7 +26,17 @@ interpret(NockExpr) ->
             Subject = subject(NockExpr),
             Formula = formula(NockExpr),
             Opcode = opcode(Formula),
-            interpret(Opcode, Subject, Formula)
+            case noun:is_atom(Opcode) of
+                true ->
+                    interpret(Opcode, Subject, Formula);
+                false ->
+                    %% Distribution rule: *[a [b c]] => [*[a b] *[a c]]
+                    FormulaX = opcode(Formula),
+                    FormulaY = slot(Formula),
+                    ResultX = interpret(noun:reconstruct(Subject, FormulaX)),
+                    ResultY = interpret(noun:reconstruct(Subject, FormulaY)),
+                    noun:reconstruct(ResultX, ResultY)
+            end
     end.
 
 interpret(Subject, Formula) ->
@@ -68,11 +78,11 @@ interpret(1, _Subject, Formula) ->
 %%   then evaluates the formula against the subject.
 
 interpret(2, Subject, Formula) ->
-    %% Evaluate the subject against position 2 (the subject) of the formula to get a new Subject
-    NewSubject = interpret(opcode(b(Formula)), Subject, b(Formula)),
+    % Evaluate the subject against position 2 (the subject) of the formula to get a new Subject
+    NewSubject = interpret(noun:reconstruct(Subject, b(Formula))),
 
-    %% Evaluate the subject against position 3 (the formula) of the formula to get a new Formula
-    NewFormula = interpret(opcode(c(Formula)), Subject, c(Formula)),
+    % Evaluate the subject against position 3 (the formula) of the formula to get a new Formula
+    NewFormula = interpret(noun:reconstruct(Subject, c(Formula))),
 
     interpret(noun:reconstruct(NewSubject, NewFormula));
 
@@ -104,14 +114,14 @@ interpret(4, Subject, Formula) ->
 %% Nock 5: Equality Check
 %%
 interpret(5, Subject, Formula) ->
-    LHS = interpret(opcode(b(Formula)), Subject, b(Formula)),
-    RHS = interpret(opcode(c(Formula)), Subject, c(Formula)),
+    LHS = interpret(noun:reconstruct(Subject, b(Formula))),
+    RHS = interpret(noun:reconstruct(Subject, c(Formula))),
     LHS =:= RHS;
 
 %% Nock 6: Conditional
 %%
 interpret(6, Subject, Formula) ->
-    Cond = interpret(opcode(b(Formula)), Subject, b(Formula)),
+    Cond = interpret(noun:reconstruct(Subject, b(Formula))),
     % erlang:display(Formula),
     % erlang:display(slot(Formula)),
     Result = if Cond -> interpret({{Subject}, subject(c(Formula))});
@@ -122,7 +132,7 @@ interpret(6, Subject, Formula) ->
 %% Nock 7: Compose
 %%
 interpret(7, Subject, Formula) ->
-    Intermediate = interpret(opcode(b(Formula)), Subject, b(Formula)),
+    Intermediate = interpret(noun:reconstruct(Subject, b(Formula))),
     Result = interpret({Intermediate, c(Formula)}),
     Result;
 
@@ -146,6 +156,7 @@ parse(String) when is_list(String) ->
 %% Parse a list until we hit the closing bracket
 parse_list([']'|Rest], Acc) ->
     {lists:reverse(Acc), Rest};
+
 parse_list(Tokens, Acc) ->
     {Elem, Remaining} = parse_tokens(Tokens),
     parse_list(Remaining, [Elem|Acc]).
@@ -153,12 +164,14 @@ parse_list(Tokens, Acc) ->
 %% Parse a number from the input
 parse_number([C|Rest], Acc) when C >= $0, C =< $9 ->
     parse_number(Rest, [C|Acc]);
+
 parse_number(Rest, Acc) ->
     {Acc, Rest}.
 
 %% Parse tokens into nested list structure
 parse_tokens(['['|Rest]) ->
     parse_list(Rest, []);
+
 parse_tokens([N|Rest]) when is_integer(N) ->
     {N, Rest}.
 
