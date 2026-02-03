@@ -44,8 +44,6 @@ from_list([]) ->
     throw({error, empty_list});
 from_list([X]) when is_integer(X) ->
     X;
-from_list([X]) when is_list(X) ->
-    from_list(X);
 from_list([H, T]) ->
     {from_list(H), from_list(T)};
 from_list([H | Rest]) ->

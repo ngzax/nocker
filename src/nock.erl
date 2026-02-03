@@ -152,8 +152,6 @@ parse(String) when is_list(String) ->
     noun:from_list(Term).
 
 %% Parse top-level tokens (implicit outer list, no brackets required)
-parse_top_level([], [Single]) ->
-    Single;
 parse_top_level([], Acc) ->
     lists:reverse(Acc);
 parse_top_level(Tokens, Acc) ->

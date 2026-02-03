@@ -24,17 +24,17 @@
 %%
 
 formula_is_cell_starting_with_atom_test() ->
-    Nock = nock:parse("[50 [0 1]]"),
+    Nock = nock:parse("50 [0 1]"),
     Result = nock:interpret(Nock),
     ?assertEqual(50, Result).
 
 formula_is_atom_fails_test() ->
     %% Should crash when formula is just an atom
-    Nock = nock:parse("[50 0]"),
+    Nock = nock:parse("50 0"),
     ?assertThrow({error, invalid_nock_expression}, nock:interpret(Nock)).
 
 formula_is_2_cells_test() ->
-    Nock = nock:parse("[50 [[0 1] [1 203]]]"),
+    Nock = nock:parse("50 [[0 1] [1 203]]"),
     Result = nock:interpret(Nock),
     ?assertEqual("[50 203]", noun:to_string(Result)).
 
@@ -47,7 +47,7 @@ string_representation_test() ->
     ?assertEqual("[33 44]", N).
 
 many_cells_test() ->
-    Nock = nock:parse("[50 [[0 1] [1 203] [0 1] [1 19] [1 76]]]"),
+    Nock = nock:parse("50 [[0 1] [1 203] [0 1] [1 19] [1 76]]"),
     Result = nock:interpret(Nock),
     ?assertEqual("[50 203 50 19 76]", noun:to_string(Result)).
 
@@ -55,7 +55,7 @@ multiple_ops_test() ->
     %% - [19 20]: [0 1], get memory slot 1
     %% - 76: [1 76], return the quoted value 76
     %% - 22: [4 4 0 3], increment twice the value in memory slot 3 (20)
-    Nock = nock:parse("[[19 20] [[0 1] [1 76] [4 4 0 3]]]"),
+    Nock = nock:parse("[19 20] [[0 1] [1 76] [4 4 0 3]]"),
     Result = nock:interpret(Nock),
     ?assertEqual("[[19 20] 76 22]", noun:to_string(Result)).
 

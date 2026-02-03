@@ -8,7 +8,7 @@
 
 subject_echo_function_test() ->
     %% [42 [1 [0 1]]] -> 42
-    Nock = nock:parse("[42 [0 1]]"),
+    Nock = nock:parse("42 [0 1]"),
     Result = nock:interpret(Nock),
     ?assertEqual(42, Result).
 
@@ -16,7 +16,7 @@ constant_function_test() ->
     %% https://urbit.org/blog/nockmas-2025-day-3
     %% *[a 2 b c] -> *[*[a b] *[a c]]
     %% [42 [2 [1 100] [1 [0 1]]]] -> 100
-    Nock = nock:parse("[42 [2 [1 100] [1 [0 1]]]]"),
+    Nock = nock:parse("42 [2 [1 100] [1 [0 1]]]"),
     Result = nock:interpret(Nock),
 
     %% This is a
@@ -35,6 +35,6 @@ constant_function_test() ->
 dynamic_formula_test() ->
     %% https://urbit.org/blog/nockmas-2025-day-3
     %% [[5 4 0 1] [2 [0 2] [0 3]]] -> 6
-    Nock = nock:parse("[[5 4 0 1] [2 [0 2] [0 3]]]"),
+    Nock = nock:parse("[5 4 0 1] [2 [0 2] [0 3]]"),
     Result = nock:interpret(Nock),
     ?assertEqual(6, Result).

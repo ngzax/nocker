@@ -21,19 +21,19 @@
 
 chain_computation_test() ->
   %% [42 [7 [4 0 1] [4 0 1]]] -> 44
-  Nock = nock:parse("[42 [7 [4 0 1] [4 0 1]]]"),
+  Nock = nock:parse("42 [7 [4 0 1] [4 0 1]]"),
   Result = nock:interpret(Nock),
   ?assertEqual(44, Result).
 
 chain_computation_plus_cell_check_test() ->
   %% [42 [7 [4 0 1] [7 [4 0 1] 3 0 1]]] ->  1 (false)
-  Nock = nock:parse("[42 [7 [4 0 1] [7 [4 0 1] 3 0 1]]]"),
+  Nock = nock:parse("42 [7 [4 0 1] [7 [4 0 1] 3 0 1]]"),
   Result = nock:interpret(Nock),
   ?assertEqual(false, Result).
  
 chain_create_cell_from_subject_cell_check_test() ->
   %% [42 [7 [[0 1] [0 1]] [3 0 1]] -> 0 (true)
-  Nock = nock:parse("[42 [7 [[0 1] [0 1]] 3 0 1]]"),
+  Nock = nock:parse("42 [7 [[0 1] [0 1]] 3 0 1]"),
   Result = nock:interpret(Nock),
   ?assertEqual(true, Result).
 
@@ -42,7 +42,7 @@ chain_extend_subject_then_perform_computation_test() ->
   %   [[42 41] [5 [0 2] [4 0 3]]] ->
   %    =[42 [41 [4 0 3]]]  ->
   %     = [42 42] -> 0 (true)
-  Nock = nock:parse("[42 [7 [[0 1] [1 41]] [5 [0 2] [4 0 3]]]]"),
+  Nock = nock:parse("42 [7 [[0 1] [1 41]] [5 [0 2] [4 0 3]]]"),
   Result = nock:interpret(Nock),
   ?assertEqual(true, Result).
 
