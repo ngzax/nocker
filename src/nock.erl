@@ -143,20 +143,26 @@ interpret(Opcode, _Subject, _Formula) ->
 %% Parser
 %%
 %% Parse a string representation into a Nock expression
-%% Example: "[[50 51] [0 1]]" -> {{50, 51}, {0, 1}}
+%% Example: "50 [0 1]" -> {50, {0, 1}}
+%% Example: "[50 51] [0 1]" -> {{50, 51}, {0, 1}}
 %% --------------------------------------------------------------------
 parse(String) when is_list(String) ->
-    %% Tokenize the string
     Tokens = tokenize(String),
-    %% Parse tokens into a list structure
-    {Term, _} = parse_tokens(Tokens),
-    %% Convert to Noun
+    Term = parse_top_level(Tokens, []),
     noun:from_list(Term).
+
+%% Parse top-level tokens (implicit outer list, no brackets required)
+parse_top_level([], [Single]) ->
+    Single;
+parse_top_level([], Acc) ->
+    lists:reverse(Acc);
+parse_top_level(Tokens, Acc) ->
+    {Elem, Remaining} = parse_tokens(Tokens),
+    parse_top_level(Remaining, [Elem|Acc]).
 
 %% Parse a list until we hit the closing bracket
 parse_list([']'|Rest], Acc) ->
     {lists:reverse(Acc), Rest};
-
 parse_list(Tokens, Acc) ->
     {Elem, Remaining} = parse_tokens(Tokens),
     parse_list(Remaining, [Elem|Acc]).
