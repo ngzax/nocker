@@ -66,6 +66,12 @@ to_list({H, T}) ->
 %% Convert to a nock-style string representation.
 %% Flattens right-associative cells: {1, {2, 3}} -> "[1 2 3]"
 %%
+to_string(true) ->
+    "true";
+
+to_string(false) ->
+    "false";
+
 to_string(N) when is_integer(N) ->
     integer_to_list(N);
 

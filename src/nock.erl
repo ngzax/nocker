@@ -136,6 +136,14 @@ interpret(7, Subject, Formula) ->
     Result = interpret({Intermediate, c(Formula)}),
     Result;
 
+%% Nock 8: Extend
+%%
+interpret(8, Subject, Formula) ->
+    Intermediate = interpret(noun:reconstruct(Subject, b(Formula))),
+    Extended_Subject = {Intermediate, Subject},
+    Result = interpret({Extended_Subject, c(Formula)}),
+    Result;
+
 interpret(Opcode, _Subject, _Formula) ->
     throw({error, {unknown_opcode, Opcode}}).
 
